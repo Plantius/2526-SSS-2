@@ -1,4 +1,3 @@
-USE proj
 create table progress
 (
     id                   int auto_increment
