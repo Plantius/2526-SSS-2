@@ -1,17 +1,19 @@
-import dotenv
-import random
-import requests
-import json
-import os
 import glob
+import json
+import logging
+import os
+import random
 import re
 import time
-import logging
+
+import dotenv
 import nltk
-import utils.database as db
-from sklearn.feature_extraction.text import TfidfVectorizer
-from utils.enums import *
+import requests
 from nltk.tokenize import RegexpTokenizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+import utils.database as db
+from utils.enums import *
 from utils.tools import gh_url_to_raw
 
 # Ensure that NLTK tokens are downloaded
@@ -120,9 +122,9 @@ def search_code(query, lang, page, items):
             if len(next_link) == 0:
                 # Reached last page
                 return
-            print(f"Going deeper ...")
+            print("Going deeper ...")
             search_code(query, lang, page + 1, items)
-    except Exception as e:
+    except Exception:
         print("Corner case rate limit, retrying in 60s")
         time.sleep(60)
         return search_code(query, lang, page, items)
@@ -247,11 +249,10 @@ def pass_to_db(repo):
         )
         download_file(download_url, filename, pending_project_id)
 
+
 def main_wip():
     read_state()
-    LANGS = [
-        ("PHP", "php")
-    ]
+    LANGS = [("PHP", "php")]
 
     next_query = BASE_QUERY
 
@@ -267,43 +268,35 @@ def main_wip():
             "mysql_db_query",
             "mysql_unbuffered_query",
             "mysql_multi_query",
-
             "mysqli_query",
             "mysqli_multi_query",
             "mysqli_real_query",
-
             "->query(",
             "->multi_query(",
             "->real_query(",
             "->exec(",
-
             "pg_query",
             "pg_send_query",
-
             "sqlite_query",
             "sqlite_exec",
             "SQLite3::query",
             "SQLite3::exec",
-
             "oci_parse",
             "oci_execute",
-
             "$wpdb->query",
             "$wpdb->get_results",
             "$wpdb->get_row",
             "$wpdb->get_var",
-
             "SELECT",
-            "\"SELECT * FROM\"",
-            "\"INSERT INTO\"",
-            "\"UPDATE\"",
-            "\"DELETE FROM\"",
-            "\"REPLACE INTO\"",
-            "\"DROP TABLE\"",
-            "\"ALTER TABLE\"",
-            "\"CREATE TABLE\"",
-            "\"WHERE\"",
-
+            '"SELECT * FROM"',
+            '"INSERT INTO"',
+            '"UPDATE"',
+            '"DELETE FROM"',
+            '"REPLACE INTO"',
+            '"DROP TABLE"',
+            '"ALTER TABLE"',
+            '"CREATE TABLE"',
+            '"WHERE"',
             "sprintf(",
             "vsprintf(",
             "implode(",

@@ -161,7 +161,7 @@ cython_debug/
 
 executer/webapp/
 
-*.sql
+postgrescvedumper-2024-09-26.sql
 .env
 .venv
 .vscode
