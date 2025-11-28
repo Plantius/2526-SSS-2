@@ -1,5 +1,4 @@
-SELECT DISTINCT (fc.file_change_id),
-    fc.code_before AS php_other_injection_count
+SELECT DISTINCT (mc.code) 
 FROM
     cve
     JOIN cwe_classification cc ON cc.cve_id = cve.cve_id
@@ -7,6 +6,7 @@ FROM
     JOIN fixes f ON f.cve_id = cve.cve_id
     JOIN repository r ON r.repo_url = f.repo_url
     JOIN file_change fc ON fc.hash = f.hash
+    JOIN method_change mc ON fc.file_change_id = mc.file_change_id
 WHERE
     fc.programming_language = 'PHP'
     AND (
@@ -17,4 +17,5 @@ WHERE
     )
     AND f.score >= 65
     AND LOWER(cve.cve_id) LIKE 'cve-2024-%'
-    AND LOWER(cve.cvss3_base_severity) IN ('high', 'critical');
+    AND LOWER(cve.cvss3_base_severity) IN ('high', 'critical')
+    AND mc.before_change = 'True';
