@@ -1,42 +1,13 @@
-<h1 align="center">Dot Dot Defender</h1>
-
-
+# SQLsweePHPer
 <p align="center">
 <img alt="Image" src="pipelineflow.png" />
 </p>
 
-
-The story starts after I discovered the [CVE-2023-39141](https://gist.github.com/JafarAkhondali/528fe6c548b78f454911fb866b23f66e), and realized the vulnerable code is spreaded EVERYWHERE. As it was technically infeasible for me to check & report manually, we decided to team up and implement a pipeline to Find, Verify SAST, DAST(0 false positives via auto running), Assess CVSS scores, Fix(GPT-4), Patch and send Pull Requests, fully automatically.
-
-
-## Full paper:
-You can access the paper [Eradicating the Unseen: Detecting, Exploiting, and Remediating a Path Traversal Vulnerability across GitHub](https://dl.acm.org/doi/10.1145/3708821.3736220)  
-_Jafar Akhoundali, Hamidreza Hamidi, Kristian Rietveld, Olga Gadyatskaya - Published in Asia CCS 2025_
-
-### Citation:
-Please cite the paper as:   
-```latex
-@inproceedings{akhoundali2025eradicating,
-  title={Eradicating the Unseen: Detecting, Exploiting, and Remediating a Path Traversal Vulnerability across GitHub},
-  author={Akhoundali, Jafar and Hamidi, Hamidreza and Rietveld, Kristian and Gadyatskaya, Olga},
-  booktitle={Proceedings of the 20th ACM Asia Conference on Computer and Communications Security},
-  pages={542--558},
-  year={2025}
-}
-```
-
-## ⚠️ Disclaimer
-
-This project is provided **strictly for research and educational purposes only**.
-
-- Do **not** attempt to send issues, vulnerability reports, or patches to repositories that have **already received a report from us**.  
-  This is partially automated in the code, so please **make sure you understand each module before execution**.  
-- The authors take **no responsibility** for any misuse of this project.  
-- Vulnerable code is executed inside Docker containers. It is **expected to be safe**, but there is **no absolute guarantee**.  
-- Although the source code of this pipeline is free to use, parts related to SAST (SemGrep and CodeQL) may have **different licenses** depending on your usage.  
-  It is the user’s responsibility to verify and comply with all applicable license agreements.  
-
----
+SQLsweePHPer is a tool that automates SQL injection vulnerability discovery in public repositories on GitHub.
+At the moment, given documents, it produces strong keywords for GitHub search, allowing circumvention of its inherent limitations regarding number of results.
+This allows the tool to discover a vast number of repositories that could contain vulnerabilities.
+Once files are found within the scope of our interest, we run SemGrep to semantically consider whether these contain an actual vulnerability.
+Future research could be automated proof-of-concept generation.
 
 ## 🔧 Installation
 
@@ -108,18 +79,9 @@ This program consists of several components. Each one is designed to run indepen
 
 7. **Pull Requester (PR Submission)**  
    ⚠️ **Warning**: If you are testing, **DO NOT RUN** `run.py` - it will re-verify the patch and send an actual pull request.
-
-
-## Sample generated patch
-<img width="780" height="311" alt="Image" src="https://github.com/user-attachments/assets/6de8b237-783c-489f-9f50-c374bd6959cd" />
-
-## LLM contamination
-This figure illustrates how training data from vulnerable repositories can contaminate LLM outputs, causing the reproduction of insecure code patterns(more details in paper).
-<img width="7200" height="2400" alt="Image" src="https://github.com/user-attachments/assets/8a6ebed3-7deb-4f0d-9f46-2f95e27480b5" />
-
-
+   
 ## 🤝 Contributing
-We welcome contributions to improve **DotDot Defender**! Morover you are more than welcome to maintain your own fork and research.
+We welcome contributions to improve **SQLsweePHPer**! Morover you are more than welcome to maintain your own fork and research.
 
 If you’d like to add features, fix bugs, or improve documentation, please follow these steps:  
 1. Fork it!
@@ -130,10 +92,3 @@ If you’d like to add features, fix bugs, or improve documentation, please foll
 
 ## License
 Although the source code of this pipeline is free to use, parts related to SAST (SemGrep and CodeQL) may have **different licenses** depending on your usage.  It is the user’s responsibility to verify and comply with all applicable license agreements.  
-
-
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=JafarAkhondali/DotDotDefender&type=Date)](https://star-history.com/#JafarAkhondali/DotDotDefender&Date)
-
