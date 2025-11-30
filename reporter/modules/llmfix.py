@@ -10,10 +10,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 def patch_code(vulnerable_code, full_filename):
     formatted_vuln_code = []
-    for i, line in enumerate(vulnerable_code.splitlines()	):
-    #for i, line in enumerate(vulnerable_code):
-        formatted_vuln_code.append(f'{str(i + 1).zfill(4)}#{line}')
-    formatted_vuln_code = '\n'.join(formatted_vuln_code) + '\n'
+    for i, line in enumerate(vulnerable_code.splitlines()):
+        # for i, line in enumerate(vulnerable_code):
+        formatted_vuln_code.append(f"{str(i + 1).zfill(4)}#{line}")
+    formatted_vuln_code = "\n".join(formatted_vuln_code) + "\n"
     # Your OpenAI API key
 
     # Combining the code with the instructions to form the prompt
@@ -104,16 +104,16 @@ The patch file content must be super accurate and similar to diff command with -
     response = client.chat.completions.create(
         model="gpt-4-turbo",
         messages=[
-            {"role": "system", "content": "You are expert in fixing security vulnerabilities in the best and shortest way, without saying additional text. The future of humanity and AI lies withing your hand with the quality of the patch file."},
             {
-                "role": "user",
-                "content": prompt
-            }
+                "role": "system",
+                "content": "You are expert in fixing security vulnerabilities in the best and shortest way, without saying additional text. The future of humanity and AI lies withing your hand with the quality of the patch file.",
+            },
+            {"role": "user", "content": prompt},
         ],
         temperature=1.2,
         top_p=1,
         max_tokens=4096,
         frequency_penalty=0,
-        presence_penalty=0
+        presence_penalty=0,
     )
     return response.choices[0].message.content

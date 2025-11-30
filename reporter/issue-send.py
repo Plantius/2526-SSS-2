@@ -11,7 +11,12 @@ import random
 import string
 import tempfile
 import os
-from utils.database import fetch_project_without_cvss, update_cvss, fetch_project_at_step, get_all
+from utils.database import (
+    fetch_project_without_cvss,
+    update_cvss,
+    fetch_project_at_step,
+    get_all,
+)
 from utils.tools import gh_url_to_raw, gh_url_to_path
 from modules.cvss import CVSS
 from modules.email import extract_email
@@ -39,14 +44,11 @@ def create_github_issue(github_token, repository, title, body):
     # Headers to authorize and accept the response
     headers = {
         "Authorization": f"token {github_token}",
-        "Accept": "application/vnd.github.v3+json"
+        "Accept": "application/vnd.github.v3+json",
     }
 
     # Issue data
-    data = {
-        "title": title,
-        "body": body
-    }
+    data = {"title": title, "body": body}
 
     # Make the POST request to create an issue
     response = requests.post(url, headers=headers, data=json.dumps(data))
@@ -71,14 +73,14 @@ def pick_lock():
 
 
 def check_repos_with_advisory(skip):
-    print('querying')
+    print("querying")
     projs = get_all(STEP_PATCH_READY)
-    print('query done')
+    print("query done")
     CHUNK = 700
     sent_issues = 0
     offset = 0
     for i, p in enumerate(projs):
-        if p['stars_count'] >= 100:
+        if p["stars_count"] >= 100:
             continue
 
         if offset <= skip:
@@ -88,21 +90,30 @@ def check_repos_with_advisory(skip):
         if sent_issues >= CHUNK:
             break
 
-        rep_address = p['project_name']
-        issue = create_github_issue(GITHUB_TOKEN, rep_address, "Vulnerability report",
-                                    f"""We conduct research on vulnerabilities in open-source software. We have discovered and verified a high-severity vulnerability in your project({p['project_name']}). Explaining the vulnerability further in this issue could allow malicious users to access details, so we recommend [enabling private vulnerability reporting on GitHub](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository) to discuss this matter confidentially.
-        After you have enabled this feature, please add a comment to this issue so we can continue our discussion. If you have any questions, feel free to leave a reply here.""")
+        rep_address = p["project_name"]
+        issue = create_github_issue(
+            GITHUB_TOKEN,
+            rep_address,
+            "Vulnerability report",
+            f"""We conduct research on vulnerabilities in open-source software. We have discovered and verified a high-severity vulnerability in your project({p["project_name"]}). Explaining the vulnerability further in this issue could allow malicious users to access details, so we recommend [enabling private vulnerability reporting on GitHub](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/configuring-private-vulnerability-reporting-for-a-repository) to discuss this matter confidentially.
+        After you have enabled this feature, please add a comment to this issue so we can continue our discussion. If you have any questions, feel free to leave a reply here.""",
+        )
         print(issue)
         print(rep_address)
-        if 'error' in issue and issue['error'] != 410:
+        if "error" in issue and issue["error"] != 410:
             break
         time.sleep(10)
         sent_issues += 1
-        print('---------------')
+        print("---------------")
 
 
 if __name__ == "__main__":
-    if input('About to open Github Issues from your account. Do you want to proceed? (Y/N)').lower() != 'y':
+    if (
+        input(
+            "About to open Github Issues from your account. Do you want to proceed? (Y/N)"
+        ).lower()
+        != "y"
+    ):
         exit()
     if os.path.isfile(LOCK_FILENAME):
         print("Already running")

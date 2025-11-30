@@ -24,8 +24,11 @@ def conv_url_to_path(url):
 
 
 def main():
-    proj_id, proj_name, proj_filename, github_url = db.fetch_project_at_step_with_pause_reason(STEP_SEMGREPED,
-                                                                                               PAUSED_POC_NOT_VULNERABLE_NETWORK)
+    proj_id, proj_name, proj_filename, github_url = (
+        db.fetch_project_at_step_with_pause_reason(
+            STEP_SEMGREPED, PAUSED_POC_NOT_VULNERABLE_NETWORK
+        )
+    )
     if not proj_id:
         print("No new projects to check")
         return
@@ -34,7 +37,9 @@ def main():
     appId = "".join(random.choices(string.hexdigits, k=8))
     print(proj_name, proj_filename, execPath)
     result = subprocess.run(
-        f"timeout 600 bash ./run-local.sh {githubLink} {execPath} {appId}", shell=True, text=True
+        f"timeout 600 bash ./run-local.sh {githubLink} {execPath} {appId}",
+        shell=True,
+        text=True,
     )
 
     # with open('run_method.txt') as run_method_file:
