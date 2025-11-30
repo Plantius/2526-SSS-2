@@ -73,28 +73,21 @@ SQL_INDICATORS = [
 ]
 
 SQL_INJECTION_PATTERN_BASES = [
-    # Direct MySQL/MySQLi functions
     "mysqli_query",
     "mysql_query",
     "mysqli_real_query",
     "mysql_unbuffered_query",
-    # PostgreSQL
     "pg_query",
-    # SQLite
     "sqlite_query",
-    # WordPress database class
     "wpdb query",
     "wpdb get_results",
-    # Object-oriented query methods
     "->query",
     "->exec",
-    # SQL keywords (concatenation patterns)
     "SELECT",
     "WHERE",
     "INSERT",
     "UPDATE",
     "DELETE",
-    # String concatenation patterns
     '". $_GET',
     '". $_POST',
     "'. $_GET",
@@ -213,30 +206,15 @@ def compute_tfidf(directory_path):
     )
 
     file_contents = []
-    skipped = 0
-
     for filename in glob.glob(os.path.join(directory_path, "*.php")):
         if os.path.isfile(filename):
             with open(filename, "r", encoding="utf-8", errors="ignore") as file:
                 content = file.read()
-                line_count = len(content.split("\n"))
-
-                if line_count < 100:
-                    file_contents.append(content)
-                else:
-                    skipped += 1
-
-    if skipped > 0:
-        logging.info(f"  Skipped {skipped} files (>100 lines)")
+                file_contents.append(content)
 
     if not file_contents:
         logging.warning(f"  No suitable PHP files found in {directory_path}")
         return []
-
-    if len(file_contents) < 2:
-        logging.warning(
-            f"  Only {len(file_contents)} file(s) found - TF-IDF works best with multiple samples"
-        )
 
     tfidf_matrix = vectorizer.fit_transform(file_contents)
     sums = tfidf_matrix.sum(axis=0)
@@ -276,39 +254,6 @@ def compute_tfidf(directory_path):
     return filtered_scores
 
 
-def has_sqli_pattern(content):
-    """
-    Heuristic check if PHP code likely contains SQL injection vulnerability.
-    """
-    has_input = re.search(r"\$_(GET|POST|REQUEST|COOKIE)", content)
-    if not has_input:
-        return False
-
-    has_query_func = re.search(
-        r"\b(mysqli_query|mysql_query|pg_query|sqlite_query|wpdb.*query)\s*\(",
-        content,
-        re.IGNORECASE,
-    )
-
-    has_method_query = re.search(r"->(query|exec|multi_query|real_query)\s*\(", content)
-    has_sql_keywords = re.search(
-        r"\b(SELECT|INSERT|UPDATE|DELETE|WHERE)\b", content, re.IGNORECASE
-    )
-    has_concat = re.search(r'["\'].*?\.\s*\$_(GET|POST|REQUEST|COOKIE)', content)
-
-    has_prepare = re.search(r"\bprepare\s*\(", content, re.IGNORECASE)
-    has_bind = re.search(
-        r"\bbind(param|value|_param|_result)\s*\(", content, re.IGNORECASE
-    )
-
-    if has_prepare and has_bind and not has_concat:
-        return False
-
-    return has_input and (
-        has_query_func or has_method_query or has_sql_keywords or has_concat
-    )
-
-
 def make_safe_filename(s):
     return re.sub(r"[^a-zA-Z0-9_\.-]", "_", s)
 
@@ -339,11 +284,10 @@ def search_code(query, page, items):
         results = response.json()
         items.extend(results.get("items", []))
 
-        # Handle rate limiting
         rate_limit_remaining = get_rate_limit_remaining(response.headers)
         if rate_limit_remaining <= 1:
             reset_time = get_rate_limit_reset_time(response.headers)
-            sleep_time = reset_time - time.time() + 2  # Extra 2s buffer
+            sleep_time = reset_time - time.time() + 2
             if sleep_time > 0:
                 logging.info(
                     f"    Rate limit reached. Sleeping for {int(sleep_time)}s..."
@@ -419,10 +363,9 @@ def add_to_db(repo):
         response = requests.get(download_url, headers=HEADERS)
         response.raise_for_status()
         content = response.text
-
-        if not has_sqli_pattern(content):
+        has_input = re.search(r"\$_(GET|POST|REQUEST|COOKIE)", content)
+        if not has_input:
             return False
-
     except Exception as e:
         logging.warning(f"    Could not verify pattern: {e}")
         return False
@@ -441,7 +384,7 @@ def generate_combined_queries(tfidf_keywords, top_n_tfidf=30):
     top_keywords = [kw for kw, score in tfidf_keywords[:top_n_tfidf]]
 
     logging.info(
-        f"  Generating queries from {len(SQL_INJECTION_PATTERN_BASES)} base patterns × {len(top_keywords)} TF-IDF keywords"
+        f"  Generating queries from {len(SQL_INJECTION_PATTERN_BASES)} base patterns x {len(top_keywords)} TF-IDF keywords"
     )
 
     for base_pattern in SQL_INJECTION_PATTERN_BASES:
