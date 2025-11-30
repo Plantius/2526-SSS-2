@@ -126,6 +126,8 @@ def tokenize_code(content):
     
     return [t for t in flat_tokens if t and t.lower() not in php_keywords]
 
+    return [t for t, _, _ in tokens if t.lower() not in php_keywords]
+
 
 def compute_tfidf(directory_path):
     """
@@ -293,6 +295,46 @@ def search_code(query, page, items):
     except Exception as e:
         logging.error(f"    Search error: {e}")
         time.sleep(5)
+
+
+def find_repos(query, keyword_index, keywords):
+    """
+    Find repositories matching query. If results are maxed out, recursively
+    refine with additional keywords.
+    """
+    items = []
+    search_code(query, 1, items)
+
+    if len(items) == 0:
+        logging.info("  No results for query")
+        return items
+
+    logging.info(f"  Found {len(items)} items")
+
+    # If we maxed out results, refine the query with next keyword
+    if len(items) >= (PAGE_SIZE * MAX_PAGES) and keyword_index < len(keywords):
+        logging.info("  Results maxed out, refining query...")
+
+        # Find next unused keyword
+        next_keyword = None
+        for i in range(keyword_index, len(keywords)):
+            candidate = keywords[i][0]
+            refined_query = f"{query} {candidate}"
+
+            # Skip if we've already tried this query
+            if refined_query not in TRIED_QUERIES:
+                next_keyword = candidate
+                keyword_index = i
+                break
+
+        if next_keyword:
+            refined_query = f"{query} {next_keyword}"
+            TRIED_QUERIES.add(refined_query)
+            # Recursively search with refined query
+            refined_items = find_repos(refined_query, keyword_index + 1, keywords)
+            items.extend(refined_items)
+
+    return items
 
 
 def save_state():
@@ -495,6 +537,11 @@ def main():
     logging.info(f"  Total repositories: {len(REPOS)}")
     logging.info(f"  Queries tried: {len(TRIED_QUERIES)}")
     logging.info(f"{'='*70}")
+    logging.info(f"\n{'=' * 70}")
+    logging.info(
+        f"COMPLETED: {len(REPOS)} total repositories with SQL injection patterns found"
+    )
+    logging.info(f"{'=' * 70}")
 
 
 if __name__ == "__main__":
