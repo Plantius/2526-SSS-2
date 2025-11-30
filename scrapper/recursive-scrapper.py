@@ -202,7 +202,7 @@ def tokenize_code(content):
         "enddeclare",
     }
 
-    return [t for t in tokens if t.lower() not in php_keywords]
+    return [t for t, _, _ in tokens if t.lower() not in php_keywords]
 
 
 def compute_tfidf(directory_path):
