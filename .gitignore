@@ -168,3 +168,5 @@ postgrescvedumper-2024-09-26.sql
 .env_old
 
 .idea
+
+state.json

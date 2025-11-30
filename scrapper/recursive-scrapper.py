@@ -411,14 +411,14 @@ def find_repos(query, keyword_index, keywords):
     search_code(query, 1, items)
 
     if len(items) == 0:
-        logging.info(f"  No results for query")
+        logging.info("  No results for query")
         return items
 
     logging.info(f"  Found {len(items)} items")
 
     # If we maxed out results, refine the query with next keyword
     if len(items) >= (PAGE_SIZE * MAX_PAGES) and keyword_index < len(keywords):
-        logging.info(f"  Results maxed out, refining query...")
+        logging.info("  Results maxed out, refining query...")
 
         # Find next unused keyword
         next_keyword = None
@@ -647,9 +647,11 @@ def main():
             logging.error(f"  Error processing keyword '{keyword}': {e}")
 
     # Final summary
-    logging.info(f"\n{'='*70}")
-    logging.info(f"COMPLETED: {len(REPOS)} total repositories with SQL injection patterns found")
-    logging.info(f"{'='*70}")
+    logging.info(f"\n{'=' * 70}")
+    logging.info(
+        f"COMPLETED: {len(REPOS)} total repositories with SQL injection patterns found"
+    )
+    logging.info(f"{'=' * 70}")
 
 
 if __name__ == "__main__":
