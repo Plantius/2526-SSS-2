@@ -263,7 +263,7 @@ def main_wip():
         print("Number of keywords:", len(keywords))
 
         for i, keyword in enumerate(keywords):
-            print(keyword, i)
+            print("Keyword:", keyword[0], "Score:", keyword[1])
             try:
                 print(f"Next query: `{next_query}`")
                 items = find_repos(lang, f"{BASE_QUERY} {keywords[i][0]}", i, keywords)
