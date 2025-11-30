@@ -33,6 +33,7 @@ timeCounter = 0
 # Use built-in PHP rulesets from the Semgrep Registry, focused on security/injection
 SEMGREP_CMD = """
 timeout 30 semgrep \
+  --config=p/php \
   --config=p/phpcs-security-audit \
   --metrics=off \
   --json --output /tmp/out.json \
