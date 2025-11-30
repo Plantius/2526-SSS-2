@@ -13,7 +13,7 @@ dotenv.load_dotenv("../.env")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 
 # Use .php so Semgrep treats it as PHP
-DL_FILE_PATH = '/tmp/newscan.php'
+DL_FILE_PATH = "/tmp/newscan.php"
 timeCounter = 0
 
 # Use built-in PHP rulesets from the Semgrep Registry, focused on security/injection
@@ -55,7 +55,7 @@ def main():
         timing_start()
 
         # Download the PHP file
-        with open(DL_FILE_PATH, 'wb') as f:
+        with open(DL_FILE_PATH, "wb") as f:
             f.write(requests.get(file_github_url).content)
 
         # Run Semgrep with PHP rules

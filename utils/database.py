@@ -16,6 +16,7 @@ sql_config = {
 
 db = sql.connect(**sql_config)
 
+
 def add_project(project_path, file_github_url, starcnt):
     c = db.cursor()
     c.execute(
@@ -47,7 +48,10 @@ def fetch_project_at_step_with_pause_reason(step_id, pause_reason):
     c.execute(
         f"SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
         f" and is_paused=1 and pause_reason=%s ORDER BY stars_count DESC LIMIT 1;",
-        (step_id, pause_reason,),
+        (
+            step_id,
+            pause_reason,
+        ),
     )
     a = c.fetchone()
     db.commit()
@@ -59,7 +63,10 @@ def fetch_project_at_step_with_pause_reason(step_id, pause_reason):
 
 def change_project_step(project_id, step_val):
     c = db.cursor()
-    c.execute(f"UPDATE progress SET step = %s, updated_at = now()  WHERE id = %s", (step_val, project_id))
+    c.execute(
+        f"UPDATE progress SET step = %s, updated_at = now()  WHERE id = %s",
+        (step_val, project_id),
+    )
     db.commit()
     c.close()
 
@@ -86,16 +93,17 @@ def update_filename(project_id, downloaded_file_name):
 
 def save_semgrep_output(project_id, out):
     c = db.cursor()
-    c.execute(f"UPDATE progress SET semgrep_out = %s, updated_at=now() WHERE id = %s", (out, project_id))
+    c.execute(
+        f"UPDATE progress SET semgrep_out = %s, updated_at=now() WHERE id = %s",
+        (out, project_id),
+    )
     db.commit()
     c.close()
 
 
 def add_timing_to_project(project_id, tname, tval):
     c = db.cursor()
-    c.execute(
-        f"SELECT stuff_times FROM progress WHERE id=%s LIMIT 1;", (project_id,)
-    )
+    c.execute(f"SELECT stuff_times FROM progress WHERE id=%s LIMIT 1;", (project_id,))
     r = c.fetchone()[0]
     if not r:
         r = {}
@@ -135,7 +143,10 @@ def fetch_project_at_step_with_dos_status(stepid, dos_status):
     c.execute(
         f"SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
         f" and is_paused=0 and is_vulnerable_to_dos=%s ORDER BY stars_count DESC LIMIT 1;",
-        (stepid, dos_status,),
+        (
+            stepid,
+            dos_status,
+        ),
     )
     a = c.fetchone()
     db.commit()
@@ -162,7 +173,13 @@ def update_cvss(proj_id, vector_string, base_score, severity):
     c = db.cursor()
     c.execute(
         f"UPDATE progress SET vector_string = %s, base_score = %s, severity = %s, step = %s, updated_at=now() WHERE id = %s",
-        (vector_string, base_score, severity, STEP_POC_CVSS_READY, proj_id,),
+        (
+            vector_string,
+            base_score,
+            severity,
+            STEP_POC_CVSS_READY,
+            proj_id,
+        ),
     )
     db.commit()
     c.close()
@@ -178,7 +195,7 @@ def set_field(proj_id, col, val):
     c.close()
 
 
-def get_field(proj_id, col, default = None):
+def get_field(proj_id, col, default=None):
     c = db.cursor()
     c.execute(
         f"select {col} from progress WHERE id = %s",
@@ -215,17 +232,19 @@ def get_by_id(project_id):
     c.close()
     return row
 
+
 def get_patchready_projects(id):
     c = db.cursor(dictionary=True)
     c.execute(
-        #f"SELECT * FROM progress WHERE step=%s AND project_name not like '%ctf%' AND project_name not like '%hue%' AND is_paused=0 AND project_name not like 'GlobalCarbonAtlas%' AND id<8000 AND pull_request_link is NULL AND id=360 ORDER BY stars_count ASC",
-        #f"-- SELECT * FROM progress WHERE step=%s AND stars_count >= 4 and stars_count <= 100 AND project_name not like '%ctf%' AND project_name not like '%hue%' AND is_paused=0 AND project_name not like 'GlobalCarbonAtlas%' AND pull_request_link is NULL ORDER BY stars_count DESC",
+        # f"SELECT * FROM progress WHERE step=%s AND project_name not like '%ctf%' AND project_name not like '%hue%' AND is_paused=0 AND project_name not like 'GlobalCarbonAtlas%' AND id<8000 AND pull_request_link is NULL AND id=360 ORDER BY stars_count ASC",
+        # f"-- SELECT * FROM progress WHERE step=%s AND stars_count >= 4 and stars_count <= 100 AND project_name not like '%ctf%' AND project_name not like '%hue%' AND is_paused=0 AND project_name not like 'GlobalCarbonAtlas%' AND pull_request_link is NULL ORDER BY stars_count DESC",
         f"SELECT * FROM progress WHERE step=%s AND id={id} AND stars_count >= 100  AND project_name not like '%ctf%' AND project_name not like '%hue%' AND is_paused=0 AND project_name not like 'GlobalCarbonAtlas%' AND pull_request_link is NULL ORDER BY stars_count DESC",
         (STEP_PATCH_READY,),
     )
     a = c.fetchall()
     c.close()
     return a
+
 
 def get_maintained_status_missing_projects():
     c = db.cursor(dictionary=True)
@@ -235,6 +254,7 @@ def get_maintained_status_missing_projects():
     a = c.fetchall()
     c.close()
     return a
+
 
 def get_firstappeard_projects():
     c = db.cursor(dictionary=True)
@@ -246,11 +266,11 @@ def get_firstappeard_projects():
     return a
 
 
-def set_pull_request(proj_id,pull_request_link):
+def set_pull_request(proj_id, pull_request_link):
     c = db.cursor()
     c.execute(
         f"UPDATE progress SET pull_request_link=%s, step=%s, updated_at = now() WHERE id=%s",
-        (pull_request_link,STEP_PATCH_SENT,proj_id),
+        (pull_request_link, STEP_PATCH_SENT, proj_id),
     )
     db.commit()
     c.close()

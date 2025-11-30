@@ -35,7 +35,9 @@ def main():
     appId = "".join(random.choices(string.hexdigits, k=8))
     print(proj_name, proj_filename, execPath)
     result = subprocess.run(
-        f"timeout 600 bash ./run-network.sh {githubLink} {execPath} {appId}", shell=True, text=True
+        f"timeout 600 bash ./run-network.sh {githubLink} {execPath} {appId}",
+        shell=True,
+        text=True,
     )
 
     exit_code = result.returncode

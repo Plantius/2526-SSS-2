@@ -24,8 +24,8 @@ def conv_url_to_path(url):
 
 
 def main():
-    proj_id, proj_name, proj_filename, github_url = db.fetch_project_at_step_with_dos_status(
-        STEP_POC_SUCCESS, DOS_NOT_CHECKED
+    proj_id, proj_name, proj_filename, github_url = (
+        db.fetch_project_at_step_with_dos_status(STEP_POC_SUCCESS, DOS_NOT_CHECKED)
     )
     if not proj_id:
         print("No new projects to check")
@@ -36,7 +36,9 @@ def main():
     appId = "".join(random.choices(string.hexdigits, k=8))
     print(proj_name, proj_filename, execPath)
     result = subprocess.run(
-        f"timeout 1200 bash ./run-dos.sh {githubLink} {execPath} {appId}", shell=True, text=True
+        f"timeout 1200 bash ./run-dos.sh {githubLink} {execPath} {appId}",
+        shell=True,
+        text=True,
     )
 
     # Get the output (stdout and stderr)
