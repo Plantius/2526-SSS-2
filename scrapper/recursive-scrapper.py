@@ -12,7 +12,6 @@ from nltk.tokenize import RegexpTokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import utils.database as db
-from utils.enums import *
 from utils.tools import gh_url_to_raw
 
 nltk.download("punkt")

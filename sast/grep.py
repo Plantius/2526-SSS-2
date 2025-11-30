@@ -1,12 +1,26 @@
-import time
-import dotenv
-import logging
-import os
 import atexit
 import json
+import logging
+import os
+import time
+
+import dotenv
 import requests
-from utils.database import *
-from utils.enums import *
+
+from utils.database import (
+    add_timing_to_project,
+    change_project_step,
+    fetch_project_at_step,
+    pause_project,
+    save_semgrep_output,
+)
+from utils.enums import (
+    PAUSED_SEMGREP_FAILED,
+    PAUSED_SEMGREP_NO_RESULT,
+    STEP_ADDED,
+    STEP_SEMGREPED,
+    STEP_SEMGREPING,
+)
 from utils.tools import runcommand
 
 dotenv.load_dotenv("../.env")
@@ -19,7 +33,6 @@ timeCounter = 0
 # Use built-in PHP rulesets from the Semgrep Registry, focused on security/injection
 SEMGREP_CMD = """
 timeout 30 semgrep \
-  --config=p/php \
   --config=p/phpcs-security-audit \
   --metrics=off \
   --json --output /tmp/out.json \
