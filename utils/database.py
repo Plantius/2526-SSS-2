@@ -20,7 +20,7 @@ db = sql.connect(**sql_config)
 def add_project(project_path, file_github_url, starcnt):
     c = db.cursor()
     c.execute(
-        f"INSERT IGNORE INTO progress (project_name,file_github_url,stars_count) VALUES (%s,%s,%s)",
+        "INSERT IGNORE INTO progress (project_name,file_github_url,stars_count) VALUES (%s,%s,%s)",
         (project_path, file_github_url, starcnt),
     )
     db.commit()
@@ -31,8 +31,8 @@ def add_project(project_path, file_github_url, starcnt):
 def fetch_project_at_step(stepid):
     c = db.cursor()
     c.execute(
-        f"SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
-        f" AND is_paused=0 ORDER BY stars_count DESC LIMIT 1;",
+        "SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
+        " AND is_paused=0 ORDER BY stars_count DESC LIMIT 1;",
         (stepid,),
     )
     a = c.fetchone()
@@ -46,8 +46,8 @@ def fetch_project_at_step(stepid):
 def fetch_project_at_step_with_pause_reason(step_id, pause_reason):
     c = db.cursor()
     c.execute(
-        f"SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
-        f" and is_paused=1 and pause_reason=%s ORDER BY stars_count DESC LIMIT 1;",
+        "SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
+        " and is_paused=1 and pause_reason=%s ORDER BY stars_count DESC LIMIT 1;",
         (
             step_id,
             pause_reason,
@@ -64,7 +64,7 @@ def fetch_project_at_step_with_pause_reason(step_id, pause_reason):
 def change_project_step(project_id, step_val):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET step = %s, updated_at = now()  WHERE id = %s",
+        "UPDATE progress SET step = %s, updated_at = now()  WHERE id = %s",
         (step_val, project_id),
     )
     db.commit()
@@ -74,7 +74,7 @@ def change_project_step(project_id, step_val):
 def pause_project(project_id, reason_val):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET is_paused = 1, pause_reason = %s, updated_at=now() WHERE id = %s",
+        "UPDATE progress SET is_paused = 1, pause_reason = %s, updated_at=now() WHERE id = %s",
         (reason_val, project_id),
     )
     db.commit()
@@ -84,7 +84,7 @@ def pause_project(project_id, reason_val):
 def update_filename(project_id, downloaded_file_name):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET downloaded_file_name = %s WHERE id = %s",
+        "UPDATE progress SET downloaded_file_name = %s WHERE id = %s",
         (downloaded_file_name, project_id),
     )
     db.commit()
@@ -94,7 +94,7 @@ def update_filename(project_id, downloaded_file_name):
 def save_semgrep_output(project_id, out):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET semgrep_out = %s, updated_at=now() WHERE id = %s",
+        "UPDATE progress SET semgrep_out = %s, updated_at=now() WHERE id = %s",
         (out, project_id),
     )
     db.commit()
@@ -103,7 +103,7 @@ def save_semgrep_output(project_id, out):
 
 def add_timing_to_project(project_id, tname, tval):
     c = db.cursor()
-    c.execute(f"SELECT stuff_times FROM progress WHERE id=%s LIMIT 1;", (project_id,))
+    c.execute("SELECT stuff_times FROM progress WHERE id=%s LIMIT 1;", (project_id,))
     r = c.fetchone()[0]
     if not r:
         r = {}
@@ -113,7 +113,7 @@ def add_timing_to_project(project_id, tname, tval):
     r[tname] = tval
     r = json.dumps(r)
 
-    c.execute(f"UPDATE progress SET stuff_times = %s WHERE id = %s", (r, project_id))
+    c.execute("UPDATE progress SET stuff_times = %s WHERE id = %s", (r, project_id))
     db.commit()
     c.close()
 
@@ -121,7 +121,7 @@ def add_timing_to_project(project_id, tname, tval):
 def set_vulnerable_to_dos(proj_id, dos_status_val):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET is_vulnerable_to_dos = %s, updated_at=now() WHERE id = %s",
+        "UPDATE progress SET is_vulnerable_to_dos = %s, updated_at=now() WHERE id = %s",
         (dos_status_val, proj_id),
     )
     db.commit()
@@ -131,7 +131,7 @@ def set_vulnerable_to_dos(proj_id, dos_status_val):
 def set_is_local_flag_and_unpause(proj_id):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET is_local = 1, is_paused = 0, pause_reason=0, updated_at=now() WHERE id = %s",
+        "UPDATE progress SET is_local = 1, is_paused = 0, pause_reason=0, updated_at=now() WHERE id = %s",
         (proj_id,),
     )
     db.commit()
@@ -141,8 +141,8 @@ def set_is_local_flag_and_unpause(proj_id):
 def fetch_project_at_step_with_dos_status(stepid, dos_status):
     c = db.cursor()
     c.execute(
-        f"SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
-        f" and is_paused=0 and is_vulnerable_to_dos=%s ORDER BY stars_count DESC LIMIT 1;",
+        "SELECT id,project_name,downloaded_file_name,file_github_url FROM progress WHERE step=%s"
+        " and is_paused=0 and is_vulnerable_to_dos=%s ORDER BY stars_count DESC LIMIT 1;",
         (
             stepid,
             dos_status,
@@ -172,7 +172,7 @@ def fetch_project_without_cvss():
 def update_cvss(proj_id, vector_string, base_score, severity):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET vector_string = %s, base_score = %s, severity = %s, step = %s, updated_at=now() WHERE id = %s",
+        "UPDATE progress SET vector_string = %s, base_score = %s, severity = %s, step = %s, updated_at=now() WHERE id = %s",
         (
             vector_string,
             base_score,
@@ -212,7 +212,7 @@ def get_field(proj_id, col, default=None):
 def get_all(stepid):
     c = db.cursor(dictionary=True)
     c.execute(
-        f"SELECT * FROM progress WHERE step=%s AND is_paused=0 ORDER BY stars_count DESC",
+        "SELECT * FROM progress WHERE step=%s AND is_paused=0 ORDER BY stars_count DESC",
         (stepid,),
     )
     a = c.fetchall()
@@ -224,7 +224,7 @@ def get_all(stepid):
 def get_by_id(project_id):
     c = db.cursor(dictionary=True)
     c.execute(
-        f"SELECT * FROM progress WHERE id=%s AND is_paused=0 limit 1",
+        "SELECT * FROM progress WHERE id=%s AND is_paused=0 limit 1",
         (project_id,),
     )
     row = c.fetchone()
@@ -249,7 +249,7 @@ def get_patchready_projects(id):
 def get_maintained_status_missing_projects():
     c = db.cursor(dictionary=True)
     c.execute(
-        f"SELECT * FROM progress WHERE step>=6 AND is_maintained is NULL ORDER BY stars_count DESC",
+        "SELECT * FROM progress WHERE step>=6 AND is_maintained is NULL ORDER BY stars_count DESC",
     )
     a = c.fetchall()
     c.close()
@@ -259,7 +259,7 @@ def get_maintained_status_missing_projects():
 def get_firstappeard_projects():
     c = db.cursor(dictionary=True)
     c.execute(
-        f"SELECT * FROM progress WHERE step>=6 AND first_appeared_at is NULL ORDER BY stars_count DESC ",
+        "SELECT * FROM progress WHERE step>=6 AND first_appeared_at is NULL ORDER BY stars_count DESC ",
     )
     a = c.fetchall()
     c.close()
@@ -269,7 +269,7 @@ def get_firstappeard_projects():
 def set_pull_request(proj_id, pull_request_link):
     c = db.cursor()
     c.execute(
-        f"UPDATE progress SET pull_request_link=%s, step=%s, updated_at = now() WHERE id=%s",
+        "UPDATE progress SET pull_request_link=%s, step=%s, updated_at = now() WHERE id=%s",
         (pull_request_link, STEP_PATCH_SENT, proj_id),
     )
     db.commit()
