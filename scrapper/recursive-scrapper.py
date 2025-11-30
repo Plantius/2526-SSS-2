@@ -18,8 +18,8 @@ from utils.tools import gh_url_to_raw
 # Ensure that NLTK tokens are downloaded
 nltk.download("punkt")
 
-if not os.path.exists("downloads"):
-    os.mkdir("downloads")
+# if not os.path.exists("downloads"):
+#     os.mkdir("downloads")
 
 dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
@@ -474,11 +474,11 @@ def download_file(url, path, proj_id):
     db.change_project_step(proj_id, STEP_CLONING)
 
     try:
-        response = requests.get(url, headers=HEADERS)
-        response.raise_for_status()
+        # response = requests.get(url, headers=HEADERS)
+        # response.raise_for_status()
 
-        with open(f"./downloads/{path}", "wb") as f:
-            f.write(response.content)
+        # with open(f"./downloads/{path}", "wb") as f:
+        #     f.write(response.content)
 
         db.update_filename(proj_id, path)
         db.change_project_step(proj_id, STEP_CLONED)
@@ -536,7 +536,7 @@ def pass_to_db(repo):
     # Add to database and download
     logging.info(f"  Adding to database: {name_with_owner}")
     pending_project_id = db.add_project(name_with_owner, download_url, stars)
-    download_file(download_url, filename, pending_project_id)
+    # download_file(download_url, filename, pending_project_id)
 
 
 def main():
@@ -548,45 +548,45 @@ def main():
     """
     read_state()
 
-    logging.info("=" * 70)
-    logging.info("PHP SQL INJECTION VULNERABILITY SEARCH")
-    logging.info("=" * 70)
+    # logging.info("=" * 70)
+    # logging.info("PHP SQL INJECTION VULNERABILITY SEARCH")
+    # logging.info("=" * 70)
 
-    # Phase 1: Known SQL injection patterns (primary method)
-    logging.info("\n[Phase 1] Searching with known SQL injection patterns...")
-    logging.info("-" * 70)
+    # # Phase 1: Known SQL injection patterns (primary method)
+    # logging.info("\n[Phase 1] Searching with known SQL injection patterns...")
+    # logging.info("-" * 70)
 
-    for i, vuln_query in enumerate(SQL_INJECTION_QUERIES, 1):
-        logging.info(f"\n[{i}/{len(SQL_INJECTION_QUERIES)}] Query: {vuln_query}")
-        TRIED_QUERIES.add(vuln_query)
+    # for i, vuln_query in enumerate(SQL_INJECTION_QUERIES, 1):
+    #     logging.info(f"\n[{i}/{len(SQL_INJECTION_QUERIES)}] Query: {vuln_query}")
+    #     TRIED_QUERIES.add(vuln_query)
 
-        items = []
-        search_code(vuln_query, 1, items)
+    #     items = []
+    #     search_code(vuln_query, 1, items)
 
-        # Deduplicate by repository
-        found = {}
-        for item in items:
-            repo_name = item["repository"]["full_name"]
-            found[repo_name] = item
+    #     # Deduplicate by repository
+    #     found = {}
+    #     for item in items:
+    #         repo_name = item["repository"]["full_name"]
+    #         found[repo_name] = item
 
-        # Process new repositories
-        new_repos = 0
-        for repo_name, repo_data in found.items():
-            if repo_name not in REPOS:
-                REPOS.append(repo_name)
-                REPO_DETAILS[repo_name] = repo_data
-                pass_to_db(repo_name)
-                new_repos += 1
+    #     # Process new repositories
+    #     new_repos = 0
+    #     for repo_name, repo_data in found.items():
+    #         if repo_name not in REPOS:
+    #             REPOS.append(repo_name)
+    #             REPO_DETAILS[repo_name] = repo_data
+    #             pass_to_db(repo_name)
+    #             new_repos += 1
 
-        logging.info(f"  New repos: {new_repos} | Total repos: {len(REPOS)}")
-        save_state()
-        time.sleep(2)  # Be nice to GitHub API
+    #     logging.info(f"  New repos: {new_repos} | Total repos: {len(REPOS)}")
+    #     save_state()
+    #     time.sleep(2)  # Be nice to GitHub API
 
     # Phase 2: Compute TF-IDF from vulnerable sections
     logging.info("\n[Phase 2] Computing TF-IDF from downloaded vulnerable sections...")
     logging.info("-" * 70)
 
-    keywords = compute_tfidf("./downloads")
+    keywords = compute_tfidf("../MoreFixes/output/")
 
     if not keywords:
         logging.warning("No TF-IDF keywords extracted. Ending here.")
